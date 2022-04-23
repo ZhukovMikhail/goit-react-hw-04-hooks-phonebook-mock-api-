@@ -20,9 +20,6 @@ export const MyForm = ({ onSubmit, contacts, isContDubled }) => {
       .required(),
   });
   const handleSubmit = (values, { resetForm }) => {
-    console.log(values);
-    ApiService.createContact(values).then(resp => console.log(resp));
-
     onSubmit(values);
     // (values);
     if (
@@ -30,6 +27,8 @@ export const MyForm = ({ onSubmit, contacts, isContDubled }) => {
       !isContDubled(contacts, values, 'number')
     ) {
       resetForm();
+      console.log(values);
+      ApiService.createContact(values).then(resp => console.log(resp));
     }
   };
   return (
