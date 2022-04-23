@@ -1,8 +1,8 @@
 import { Formik, ErrorMessage } from 'formik';
 import * as yup from 'yup';
 import { StyledForm, Item, StyledButton } from 'components/Form/Form.styled';
-import * as ApiService from '../../services/api';
-
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 import PropTypes from 'prop-types';
 
 export const MyForm = ({ onSubmit, contacts, isContDubled }) => {
@@ -20,42 +20,50 @@ export const MyForm = ({ onSubmit, contacts, isContDubled }) => {
       .required(),
   });
   const handleSubmit = (values, { resetForm }) => {
-    onSubmit(values);
-    // (values);
     if (
       !isContDubled(contacts, values, 'name') &&
       !isContDubled(contacts, values, 'number')
     ) {
-      resetForm();
+      onSubmit(values);
       console.log(values);
-      ApiService.createContact(values).then(resp => console.log(resp));
+      resetForm();
+    } else {
+      notify();
     }
   };
+  const notify = () =>
+    toast.warn('That NAME or NUMBER already exist', {
+      position: toast.POSITION.TOP_CENTER,
+    });
+
   return (
-    <Formik
-      initialValues={initialValues}
-      onSubmit={handleSubmit}
-      validationSchema={schema}
-    >
-      {({ handleReset }) => (
-        <StyledForm>
-          <label htmlFor="">
-            Name
-            <Item type="text" name="name" />
-            <ErrorMessage name="name" />
-          </label>
-          <label htmlFor="">
-            Number
-            <Item type="tel" name="number" />
-            <ErrorMessage name="number" />
-          </label>
-          <StyledButton type="submit">Add contact</StyledButton>
-          <StyledButton type="button" onClick={e => handleReset()}>
-            Clear form
-          </StyledButton>
-        </StyledForm>
-      )}
-    </Formik>
+    <>
+      <ToastContainer />
+      <Formik
+        initialValues={initialValues}
+        onSubmit={handleSubmit}
+        validationSchema={schema}
+      >
+        {({ handleReset }) => (
+          <StyledForm>
+            <label htmlFor="">
+              Name
+              <Item type="text" name="name" />
+              <ErrorMessage name="name" />
+            </label>
+            <label htmlFor="">
+              Number
+              <Item type="tel" name="number" />
+              <ErrorMessage name="number" />
+            </label>
+            <StyledButton type="submit">Add contact</StyledButton>
+            <StyledButton type="button" onClick={e => handleReset()}>
+              Clear form
+            </StyledButton>
+          </StyledForm>
+        )}
+      </Formik>
+    </>
   );
 };
 
