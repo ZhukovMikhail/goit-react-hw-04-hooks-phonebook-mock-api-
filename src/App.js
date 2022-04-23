@@ -1,27 +1,50 @@
 import './App.styled.jsx';
 import PropTypes from 'prop-types';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { Container } from 'App.styled';
 import { MyForm } from 'components/Form/Form.jsx';
 import { Contacts } from 'components/Contacts/Contacts.jsx';
 import { Filter } from 'components/Filter/Filter.jsx';
-import { v4 as uuidv4 } from 'uuid';
+// import { v4 as uuidv4 } from 'uuid';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
-
-const defaultContacts = [
-  { id: 'id-1', name: 'Rosie Simpson', number: '459-12-56' },
-  { id: 'id-2', name: 'Hermione Kline', number: '443-89-12' },
-  { id: 'id-3', name: 'Eden Clements', number: '645-17-79' },
-  { id: 'id-4', name: 'Annie Copeland', number: '227-91-26' },
-];
-const derivedContact = JSON.parse(localStorage.getItem('contacts'));
+import * as ApiService from './services/api';
 
 const App = () => {
-  const [contacts, setContacts] = useState(
-    () => derivedContact ?? defaultContacts,
-  );
+  const [contacts, setContacts] = useState([]);
+  const [addcontact, setAddContact] = useState(null);
   const [filter, setFilter] = useState('');
+  const [deleteId, setDeleteId] = useState(null);
+  const ref = useRef(1);
+
+  useEffect(() => {
+    console.log('useEffect get');
+    ref.current += 1;
+    console.log(ref.current);
+    ApiService.getContacts().then(r => setContacts(r));
+  }, []);
+  // ================Так почемуто не работает!!!!=========================
+  // useEffect(() => {
+  //   console.log('useEffect create');
+  //   ApiService.createContact(addcontact).then(resp => console.log(resp));
+  // }, [addcontact]);
+  // App.js:20 useEffect get
+  // App.js:25 useEffect create
+  // App.js:32 useEffect delete
+  // App.js:20 useEffect get
+  // App.js:25 useEffect create
+  // App.js:32 useEffect delete
+
+  // =======================================================================
+
+  useEffect(() => {
+    console.log('useEffect delete');
+    console.log(ref.current);
+
+    ApiService.deleteContact(deleteId).then(r => console.log(r));
+
+    setTimeout(() => ApiService.getContacts().then(r => setContacts(r)), 600);
+  }, [deleteId]);
 
   const notify = () =>
     toast.warn('That NAME or NUMBER already exist', {
@@ -41,21 +64,17 @@ const App = () => {
       notify();
       return;
     }
-    setContacts(prevState => [...prevState, { id: uuidv4(), ...data }]);
+    setAddContact(data);
+    setTimeout(() => ApiService.getContacts().then(r => setContacts(r)), 600);
   };
+
   const filterHendle = data => {
     setFilter(data);
   };
-  const handleDelete = e => {
-    const chengedContacts = contacts.filter(
-      contact => contact.id !== e.currentTarget.parentElement.id,
-    );
-    setContacts(chengedContacts);
-  };
 
-  useEffect(() => {
-    localStorage.setItem('contacts', JSON.stringify(contacts));
-  }, [contacts]);
+  const handleDelete = e => {
+    setDeleteId(e.currentTarget.parentElement.id);
+  };
 
   const filteredContacts = contacts.filter(contact => {
     return contact.name

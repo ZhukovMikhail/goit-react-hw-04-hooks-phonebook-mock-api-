@@ -1,7 +1,7 @@
 import styled from '@emotion/styled';
 
 export const StyledContList = styled.ul`
-  width: 300px;
+  width: 400px;
   margin: 10px 10px;
 `;
 export const StyledItem = styled.li`

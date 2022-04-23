@@ -1,6 +1,8 @@
 import { Formik, ErrorMessage } from 'formik';
 import * as yup from 'yup';
 import { StyledForm, Item, StyledButton } from 'components/Form/Form.styled';
+import * as ApiService from '../../services/api';
+
 import PropTypes from 'prop-types';
 
 export const MyForm = ({ onSubmit, contacts, isContDubled }) => {
@@ -18,7 +20,11 @@ export const MyForm = ({ onSubmit, contacts, isContDubled }) => {
       .required(),
   });
   const handleSubmit = (values, { resetForm }) => {
+    console.log(values);
+    ApiService.createContact(values).then(resp => console.log(resp));
+
     onSubmit(values);
+    // (values);
     if (
       !isContDubled(contacts, values, 'name') &&
       !isContDubled(contacts, values, 'number')
