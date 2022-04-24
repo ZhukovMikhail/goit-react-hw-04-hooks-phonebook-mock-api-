@@ -5,8 +5,6 @@ import { Container } from 'App.styled';
 import { MyForm } from 'components/Form/Form.jsx';
 import { Contacts } from 'components/Contacts/Contacts.jsx';
 import { Filter } from 'components/Filter/Filter.jsx';
-// import { v4 as uuidv4 } from 'uuid';
-
 import * as ApiService from './services/api';
 
 const App = () => {
@@ -18,7 +16,9 @@ const App = () => {
 
   useEffect(() => {
     console.log('useEffect get', 'ref.current:', ref.current);
-    ApiService.getContacts().then(r => setContacts(r));
+    ApiService.getContacts()
+      .then(r => setContacts(r))
+      .catch(e => console.log(e));
   }, []);
 
   useEffect(() => {
@@ -26,8 +26,14 @@ const App = () => {
       return;
     }
     console.log('useEffect create', 'ref.current:', ref.current);
-    ApiService.createContact(addcontact).then(resp => console.log(resp));
-    setTimeout(() => ApiService.getContacts().then(r => setContacts(r)), 600);
+    ApiService.createContact(addcontact)
+      .then(resp => {
+        console.log(resp);
+        ApiService.getContacts()
+          .then(r => setContacts(r))
+          .catch(e => console.log(e));
+      })
+      .catch(e => console.log(e));
   }, [addcontact]);
 
   useEffect(() => {
@@ -35,9 +41,12 @@ const App = () => {
       return;
     }
     console.log('useEffect delete', 'ref.current:', ref.current);
-    ApiService.deleteContact(deleteId).then(r => console.log(r));
-
-    setTimeout(() => ApiService.getContacts().then(r => setContacts(r)), 600);
+    ApiService.deleteContact(deleteId).then(r => {
+      console.log(r);
+      ApiService.getContacts()
+        .then(r => setContacts(r))
+        .catch(e => console.log(e));
+    });
   }, [deleteId]);
 
   const isContactDubled = (arr, data, key) => {

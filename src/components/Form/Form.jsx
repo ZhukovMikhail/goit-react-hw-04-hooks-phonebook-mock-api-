@@ -25,7 +25,6 @@ export const MyForm = ({ onSubmit, contacts, isContDubled }) => {
       !isContDubled(contacts, values, 'number')
     ) {
       onSubmit(values);
-      console.log(values);
       resetForm();
     } else {
       notify();
